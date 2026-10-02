@@ -2,8 +2,8 @@ from models.item_catalogo.itemCatalogo import ItemCatalogo
 from models.item_catalogo.avaliacoes import Avaliacoes
 
 class Disco(ItemCatalogo):
-    def __init__(self, titulo, artista, ano_lancamento, genero, formato_midia, preco):
-        super().__init__(titulo, genero,  ano_lancamento, preco)
+    def __init__(self, titulo, artista, ano_lancamento, genero, formato_midia, preco, imagem):
+        super().__init__(titulo, genero,  ano_lancamento, preco, imagem)
         self._artista = artista
         self._formato_midia = formato_midia
         self._avaliacoes = []

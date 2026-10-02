@@ -1,12 +1,12 @@
 from database.db import conectar
 from models.loja import Loja
 
-def salvar(loja):
+def salvar_loja(loja):
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
         INSERT INTO lojas (nome_loja, cidade, status) VALUES (%s, %s, %s)
-    """, (loja.nome, loja.cidade, 'Pendente'))
+    """, (loja.nome_loja, loja.cidade, 'Pendente'))
     conexao.commit()
     id_gerado = cursor.lastrowid
     conexao.close()
@@ -49,3 +49,31 @@ def listar_todos():
         loja.id = id_loja
         lojas.append(loja)
     return lojas
+
+def atualizar_status(id_loja, novo_status):
+    if novo_status not in Loja.STATUS_VALIDOS:
+        raise ValueError(f"Status inválido: {novo_status}")
+
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute(
+        "UPDATE lojas SET status = %s WHERE id = %s",
+        (novo_status, id_loja)
+    )
+    conexao.commit()
+    conexao.close()
+
+def listar_completo(nome_loja):
+    from repositories import avaliacao_repo, catalogo_repo
+
+    loja = buscar_por_nome(nome_loja)
+    if loja is None:
+        return None
+
+    for avaliacao in avaliacao_repo.listar_por_loja(nome_loja):
+        loja._avaliacoes.append(avaliacao)
+
+    for item in catalogo_repo.listar_por_loja(nome_loja):
+        loja.adicionar_catalogo(item)
+
+    return loja

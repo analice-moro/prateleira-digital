@@ -2,8 +2,8 @@ from models.item_catalogo.itemCatalogo import ItemCatalogo
 from models.item_catalogo.avaliacoes import Avaliacoes
 
 class Revista(ItemCatalogo):
-    def __init__(self, titulo, editora, ano_lancamento, genero, periodicidade, preco):
-        super().__init__(titulo, genero, ano_lancamento, preco)
+    def __init__(self, titulo, editora, ano_lancamento, genero, periodicidade, preco, imagem):
+        super().__init__(titulo, genero, ano_lancamento, preco, imagem)
         self._editora = editora
         self._periodicidade = periodicidade
         self._avaliacoes = []

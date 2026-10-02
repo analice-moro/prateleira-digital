@@ -2,8 +2,8 @@ from models.item_catalogo.itemCatalogo import ItemCatalogo
 from models.item_catalogo.avaliacoes import Avaliacoes
 
 class Livro(ItemCatalogo):
-    def __init__(self, titulo, autor, ano_lancamento, genero, preco, sinopse):
-        super().__init__(titulo, genero, ano_lancamento, preco)
+    def __init__(self, titulo, autor, ano_lancamento, genero, preco, sinopse, imagem):
+        super().__init__(titulo, genero, ano_lancamento, preco, imagem)
         self._autor = autor
         self._sinopse = sinopse
         self._avaliacoes = []
