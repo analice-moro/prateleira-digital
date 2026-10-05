@@ -101,3 +101,26 @@ def reconstruir_imagem(caminho_img, imagem):
         arquivo.write(dados_binarios)
 
     return dados_binarios
+
+def listar_todos():
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        SELECT * FROM itens_catalogo
+    """)
+    resultados = cursor.fetchall()
+    conexao.close()
+
+    itens = []
+    for titulo, genero, ano_lancamento, preco, tipo_item, caminho_img, imagem, autor, sinopse, artista, formato_midia, editora, periodicidade in resultados:
+        preco = float(preco)
+        if tipo_item == "Livro":
+            img = reconstruir_imagem(caminho_img, imagem)
+            itens.append(Livro(titulo, autor, ano_lancamento, genero, preco, sinopse, img))
+        elif tipo_item == "Disco":
+            img = reconstruir_imagem(caminho_img, imagem)
+            itens.append(Disco(titulo, artista, ano_lancamento, genero, formato_midia, preco, img))
+        elif tipo_item == "Revista":
+            img = reconstruir_imagem(caminho_img, imagem)
+            itens.append(Revista(titulo, editora, ano_lancamento, genero, periodicidade, preco, img))
+    return itens
