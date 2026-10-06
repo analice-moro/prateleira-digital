@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro | Prateleira Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="{{ url_for('index') }}" class="logo">Prateleira Digital</a>
+            <nav class="navbar__links">
+                <a href="{{ url_for('cadastro') }}">Cadastro</a>
+                <a href="{{ url_for('login') }}" class="btn btn--light">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth">
+        <section class="auth__card">
+            <div class="auth__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+            </div>
+            <h1 class="auth__title">Crie sua conta</h1>
+            <p class="auth__subtitle">Junte-se a nós e encontre tesouros para a sua estante.</p>
+
+            {% if erro %}
+                <div class="auth__error" role="alert">{{ erro }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('cadastro') }}" class="form" id="form-cadastro">
+                <div class="form__group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" placeholder="Seu nome" required autocomplete="name">
+                </div>
+                <div class="form__group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" placeholder="voce@email.com" required autocomplete="email">
+                </div>
+                <div class="form__group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" placeholder="Mínimo de 6 caracteres" minlength="6" required autocomplete="new-password">
+                </div>
+                <div class="form__group">
+                    <label for="confirmar_senha">Confirmar senha</label>
+                    <input type="password" id="confirmar_senha" placeholder="Repita a senha" minlength="6" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn--block">Criar conta</button>
+            </form>
+
+            <p class="auth__switch">Já tem conta? <a href="{{ url_for('login') }}">Entrar</a></p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__col">
+                <span class="footer__brand">Prateleira Digital</span>
+                <p>Sua estante aconchegante na internet.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Links úteis</h4>
+                <a href="{{ url_for('index') }}">Início</a>
+                <a href="{{ url_for('cadastro') }}">Cadastro</a>
+                <a href="{{ url_for('login') }}">Login</a>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <a href="mailto:prateleiradigital@email.com">prateleiradigital@email.com</a>
+                <div class="socials">
+                    <a href="#" aria-label="Instagram" class="socials__icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="footer__copy">© 2026 Prateleira Digital. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('form-cadastro');
+        const senha = document.getElementById('senha');
+        const confirmar = document.getElementById('confirmar_senha');
+
+        function validar() {
+            confirmar.setCustomValidity(
+                confirmar.value && confirmar.value !== senha.value ? 'As senhas não coincidem.' : ''
+            );
+        }
+        senha.addEventListener('input', validar);
+        confirmar.addEventListener('input', validar);
+        form.addEventListener('submit', validar);
+    </script>
+
+</body>
+</html>

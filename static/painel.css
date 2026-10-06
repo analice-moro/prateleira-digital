@@ -1,0 +1,178 @@
+/* Painel pós-login — complementa landing.css (variáveis, navbar, botões e rodapé) */
+
+:root {
+    --cor-livros: #C85A32;
+    --cor-revistas: #8C4356;
+    --cor-discos: #3B625B;
+    --aba-inativa: #EFE6D6;
+}
+
+.navbar__user { font-style: italic; opacity: 0.9; }
+
+.painel { padding: 40px 0 72px; }
+
+.aviso {
+    background: rgba(59, 98, 91, 0.1);
+    border: 1px solid rgba(59, 98, 91, 0.4);
+    color: var(--cor-discos);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-weight: 600;
+}
+
+/* ---------- Abas ---------- */
+.tab[data-tab="livros"],   .tabpanel[data-tab="livros"]   { --c: var(--cor-livros); }
+.tab[data-tab="revistas"], .tabpanel[data-tab="revistas"] { --c: var(--cor-revistas); }
+.tab[data-tab="discos"],   .tabpanel[data-tab="discos"]   { --c: var(--cor-discos); }
+
+.tabs {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    overflow-x: auto;
+    padding-top: 4px;
+}
+
+.tab {
+    flex: 1 1 0;
+    min-width: 150px;
+    max-width: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 24px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--aba-inativa);
+    border: 1px solid rgba(56, 38, 33, 0.12);
+    border-bottom: none;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -3px 10px rgba(56, 38, 33, 0.06);
+    cursor: pointer;
+    transition: background .15s ease, transform .15s ease;
+}
+.tab:hover { transform: translateY(-2px); }
+.tab:focus-visible { outline: 3px solid rgba(200, 90, 50, 0.45); outline-offset: 2px; }
+
+.tab svg { color: var(--c); flex-shrink: 0; }
+
+.tab small {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 4px;
+    opacity: 0.7;
+}
+
+.tab.is-active {
+    background: var(--c);
+    color: #FDFBF7;
+    border-color: var(--c);
+    padding-top: 18px;
+}
+.tab.is-active svg { color: #FDFBF7; }
+
+/* ---------- Painel da aba ---------- */
+.tabpanel {
+    background: #fff;
+    border-top: 4px solid var(--c);
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 32px 28px 40px;
+}
+.tabpanel[hidden] { display: none; }
+
+.tabpanel__titulo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 26px;
+}
+
+.vazio { font-style: italic; opacity: 0.75; padding: 24px 0; }
+
+/* ---------- Itens ---------- */
+.itens {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 28px 24px;
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border: 1px solid rgba(56, 38, 33, 0.08);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.item:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+
+.item__capa {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    background: var(--aba-inativa);
+    display: grid;
+    place-items: center;
+    color: rgba(56, 38, 33, 0.35);
+}
+.item__capa img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Discos têm capa quadrada */
+.tabpanel[data-tab="discos"] .item__capa { aspect-ratio: 1 / 1; }
+
+.item__info { padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+.item__titulo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.1rem;
+    line-height: 1.3;
+}
+.item__sub { font-weight: 600; font-size: 0.95rem; }
+.item__meta { font-size: 0.85rem; opacity: 0.75; }
+
+.item__detalhe {
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.8;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.item__rodape {
+    margin-top: auto;
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.item__preco { font-weight: 700; font-size: 1.15rem; color: var(--c); }
+.item__loja { font-size: 0.8rem; opacity: 0.7; }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 640px) {
+    .navbar__user { display: none; }
+    .tab { min-width: 0; padding: 12px 10px; font-size: 0.85rem; letter-spacing: 0.5px; gap: 6px; }
+    .tab svg { width: 20px; height: 20px; }
+    .tab small { display: none; }
+    .tabpanel { padding: 24px 16px 32px; }
+    .itens { grid-template-columns: repeat(2, 1fr); gap: 18px 14px; }
+}

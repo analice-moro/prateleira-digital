@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Prateleira Digital</title>
+    <title>Cadastrar loja | Prateleira Digital</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='painel.css') }}">
 </head>
 <body>
 
@@ -16,8 +17,8 @@
         <div class="navbar__inner">
             <a href="{{ url_for('index') }}" class="logo">Prateleira Digital</a>
             <nav class="navbar__links">
-                <a href="{{ url_for('cadastro') }}">Cadastro</a>
-                <a href="{{ url_for('login') }}" class="btn btn--light">Login</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </div>
     </header>
@@ -26,30 +27,29 @@
         <section class="auth__card">
             <div class="auth__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    <path d="m3 9 1-5h16l1 5"/><path d="M4 9v11h16V9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M10 20v-6h4v6"/>
                 </svg>
             </div>
-            <h1 class="auth__title">Bem-vindo de volta</h1>
-            <p class="auth__subtitle">Entre para continuar folheando a estante.</p>
+            <h1 class="auth__title">Cadastrar loja</h1>
+            <p class="auth__subtitle">Sua loja ficará pendente até ser aprovada pela nossa equipe.</p>
 
             {% if erro %}
                 <div class="auth__error" role="alert">{{ erro }}</div>
             {% endif %}
 
-            <form method="POST" action="{{ url_for('login') }}" class="form">
+            <form method="POST" action="{{ url_for('cadastrar_loja') }}" class="form">
                 <div class="form__group">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" placeholder="voce@email.com" required autocomplete="email">
+                    <label for="nome_loja">Nome da loja</label>
+                    <input type="text" id="nome_loja" name="nome_loja" placeholder="Ex.: Sebo do Zé" required>
                 </div>
                 <div class="form__group">
-                    <label for="senha">Senha</label>
-                    <input type="password" id="senha" name="senha" placeholder="Sua senha" required autocomplete="current-password">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" name="cidade" placeholder="Ex.: Curitiba" required>
                 </div>
-                <button type="submit" class="btn btn--block">Entrar</button>
+                <button type="submit" class="btn btn--block">Enviar para aprovação</button>
             </form>
 
-            <p class="auth__switch">Ainda não tem conta? <a href="{{ url_for('cadastro') }}">Cadastre-se</a></p>
+            <p class="auth__switch"><a href="{{ url_for('painel') }}">← Voltar ao painel</a></p>
         </section>
     </main>
 
@@ -62,8 +62,8 @@
             <div class="footer__col">
                 <h4>Links úteis</h4>
                 <a href="{{ url_for('index') }}">Início</a>
-                <a href="{{ url_for('cadastro') }}">Cadastro</a>
-                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
             </div>
             <div class="footer__col">
                 <h4>Contato</h4>

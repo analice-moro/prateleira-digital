@@ -57,8 +57,13 @@ def salvar_item(id_loja, item):
     else:
         raise ValueError("O item precisa ser um Livro, Disco ou Revista")
 
-    with open(item.imagem, 'rb') as arquivo:
-        dados_binarios = arquivo.read()
+    if isinstance(item.imagem, (bytes, bytearray)):
+        dados_binarios = bytes(item.imagem)
+        caminho_img = getattr(item, 'nome_arquivo', None) or 'imagem'
+    else:
+        with open(item.imagem, 'rb') as arquivo:
+            dados_binarios = arquivo.read()
+        caminho_img = item.imagem
 
     conexao = conectar()
     cursor = conexao.cursor()
@@ -66,7 +71,7 @@ def salvar_item(id_loja, item):
         INSERT INTO itens_catalogo
             (id_loja, titulo_item, genero_item, ano_lancamento_item, preco_item, tipo_item, caminho_img_item, imagem_item, autor_item, sinopse_item, artista_item, formato_midia_item, editora_item, periodicidade_item)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, (id_loja, item._titulo, item._genero, item._ano_lancamento, item._preco, tipo_item, item.imagem, dados_binarios, autor_item, sinopse_item, artista_item, formato_midia_item, editora_item, periodicidade_item))
+    """, (id_loja, item._titulo, item._genero, item._ano_lancamento, item._preco, tipo_item, caminho_img, dados_binarios, autor_item, sinopse_item, artista_item, formato_midia_item, editora_item, periodicidade_item))
     conexao.commit()
     conexao.close()
 
@@ -106,21 +111,39 @@ def listar_todos():
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        SELECT * FROM itens_catalogo
+        SELECT itens_catalogo.id, itens_catalogo.id_loja, lojas.nome_loja, itens_catalogo.titulo_item, itens_catalogo.genero_item, itens_catalogo.ano_lancamento_item, itens_catalogo.preco_item, itens_catalogo.tipo_item, itens_catalogo.autor_item, itens_catalogo.sinopse_item, itens_catalogo.artista_item, itens_catalogo.formato_midia_item, itens_catalogo.editora_item, itens_catalogo.editora_item 
+        FROM itens_catalogo 
+        JOIN lojas ON lojas.id = itens_catalogo.id_loja
+        WHERE lojas.status = 'Ativo' 
     """)
     resultados = cursor.fetchall()
     conexao.close()
 
     itens = []
-    for titulo, genero, ano_lancamento, preco, tipo_item, caminho_img, imagem, autor, sinopse, artista, formato_midia, editora, periodicidade in resultados:
+    for id_item, id_loja, nome_loja, titulo, genero, ano_lancamento, preco, tipo_item, autor, sinopse, artista, formato_midia, editora, periodicidade in resultados:
         preco = float(preco)
         if tipo_item == "Livro":
-            img = reconstruir_imagem(caminho_img, imagem)
-            itens.append(Livro(titulo, autor, ano_lancamento, genero, preco, sinopse, img))
+            item = Livro(titulo, autor, ano_lancamento, genero, preco, sinopse, None)
         elif tipo_item == "Disco":
-            img = reconstruir_imagem(caminho_img, imagem)
-            itens.append(Disco(titulo, artista, ano_lancamento, genero, formato_midia, preco, img))
+            item = Disco(titulo, artista, ano_lancamento, genero, formato_midia, preco, None)
         elif tipo_item == "Revista":
-            img = reconstruir_imagem(caminho_img, imagem)
-            itens.append(Revista(titulo, editora, ano_lancamento, genero, periodicidade, preco, img))
+            item = Revista(titulo, editora, ano_lancamento, genero, periodicidade, preco, None)
+
+        item.id = id_item
+        item.id_loja = id_loja
+        item.nome_loja = nome_loja
+        itens.append(item)
     return itens
+
+def buscar_imagem(id_item):
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        SELECT imagem_item, caminho_img_item FROM itens_catalogo WHERE id = %s
+    """, (id_item,))
+    linha = cursor.fetchone()
+    conexao.close()
+
+    if linha is None or not linha[0]:
+        return None
+    return linha[0], linha[1]

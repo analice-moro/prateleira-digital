@@ -1,5 +1,6 @@
 from database.db import conectar
 from models.loja import Loja
+from repositories import avaliacoes_repo, catalogo_repo
 
 def salvar_loja(loja):
     conexao = conectar()
@@ -33,7 +34,7 @@ def buscar_por_nome(nome_loja):
     loja.id = id_loja
     return loja
 
-def buscar_por_id(od_loja):
+def buscar_por_id(id_loja):
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
@@ -66,6 +67,14 @@ def listar_todos():
         loja.definir_status(status)
         loja.id = id_loja
         lojas.append(loja)
+
+    for loja in lojas:
+        for avaliacao in avaliacoes_repo.listar_por_loja(nome_loja):
+            loja._avaliacoes.append(avaliacao)
+        
+        for item in catalogo_repo.listar_por_loja(nome_loja):
+            loja.adicionar_catalogo(item)
+    
     return lojas
 
 def atualizar_status(id_loja, novo_status):
@@ -81,14 +90,17 @@ def atualizar_status(id_loja, novo_status):
     conexao.commit()
     conexao.close()
 
+def _carregar_avaliacoes(loja):
+    for avaliacao in avaliacoes_repo.listar_por_loja(loja.id):
+        loja._avaliacoes.append(avaliacao)
+
 def listar_completo(nome_loja):
-    from repositories import avaliacao_repo, catalogo_repo
 
     loja = buscar_por_nome(nome_loja)
     if loja is None:
         return None
 
-    for avaliacao in avaliacao_repo.listar_por_loja(nome_loja):
+    for avaliacao in avaliacoes_repo.listar_por_loja(nome_loja):
         loja._avaliacoes.append(avaliacao)
 
     for item in catalogo_repo.listar_por_loja(nome_loja):
@@ -111,4 +123,7 @@ def listar_por_status(status):
         loja.definir_status(status_banco)
         loja.id = id_loja
         lojas.append(loja)
+
+    for loja in lojas:
+        _carregar_avaliacoes(loja)
     return lojas

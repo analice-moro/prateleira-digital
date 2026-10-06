@@ -1,0 +1,96 @@
+/* Páginas de login e cadastro — complementa landing.css (variáveis, navbar, botões e rodapé) */
+
+.auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 16px 72px;
+}
+
+.auth__card {
+    width: min(440px, 100%);
+    background: #fff;
+    border: 1px solid rgba(56, 38, 33, 0.08);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 36px 32px;
+    text-align: center;
+}
+
+.auth__icon {
+    width: 60px; height: 60px;
+    display: grid; place-items: center;
+    margin: 0 auto 16px;
+    border-radius: 16px;
+    background: rgba(200, 90, 50, 0.12);
+    color: var(--accent);
+}
+
+.auth__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.8rem;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.auth__subtitle {
+    font-style: italic;
+    opacity: 0.85;
+    margin-bottom: 24px;
+}
+
+.auth__error {
+    background: rgba(139, 38, 40, 0.08);
+    border: 1px solid rgba(139, 38, 40, 0.35);
+    color: var(--header);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* ---------- Formulário ---------- */
+.form { display: flex; flex-direction: column; gap: 18px; text-align: left; }
+
+.form__group { display: flex; flex-direction: column; gap: 6px; }
+
+.form__group label { font-weight: 600; font-size: 0.95rem; }
+
+.form__group input {
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1.5px solid rgba(56, 38, 33, 0.25);
+    border-radius: 12px;
+    padding: 11px 14px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.form__group input::placeholder { color: rgba(56, 38, 33, 0.45); font-style: italic; }
+
+.form__group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(200, 90, 50, 0.18);
+}
+
+.btn--block {
+    width: 100%;
+    margin-top: 6px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.05rem;
+    padding: 12px 22px;
+}
+
+.auth__switch { margin-top: 22px; font-size: 0.95rem; }
+.auth__switch a { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.auth__switch a:hover { color: var(--header); }
+
+@media (max-width: 520px) {
+    .auth { padding: 36px 16px 56px; }
+    .auth__card { padding: 28px 20px; }
+}

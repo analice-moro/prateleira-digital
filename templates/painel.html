@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel | Prateleira Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='painel.css') }}">
+</head>
+<body>
+
+{# Card de um item do catálogo: imagem em cima, informações embaixo #}
+{% macro item_card(item, subtitulo, detalhe) %}
+    <article class="item">
+        <figure class="item__capa">
+            <svg class="item__placeholder" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>
+            </svg>
+            <img src="{{ url_for('imagem_item', id_item=item.id) }}" alt="Capa de {{ item._titulo }}" loading="lazy" onerror="this.style.display='none'">
+        </figure>
+        <div class="item__info">
+            <h3 class="item__titulo">{{ item._titulo }}</h3>
+            {% if subtitulo %}<p class="item__sub">{{ subtitulo }}</p>{% endif %}
+            <p class="item__meta">{{ item._genero }} · {{ item._ano_lancamento|int }}</p>
+            {% if detalhe %}<p class="item__detalhe">{{ detalhe }}</p>{% endif %}
+            <div class="item__rodape">
+                <span class="item__preco">R$ {{ '%.2f'|format(item._preco)|replace('.', ',') }}</span>
+                <span class="item__loja">{{ item.nome_loja }}</span>
+            </div>
+        </div>
+    </article>
+{% endmacro %}
+
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="{{ url_for('index') }}" class="logo">Prateleira Digital</a>
+            <nav class="navbar__links">
+                {% if usuario %}<span class="navbar__user">Olá, {{ usuario.nome_usuario }}</span>{% endif %}
+                <a href="{{ url_for('listar_lojas') }}" class="btn">Ver lojas</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="painel">
+        <div class="container">
+
+            {% with mensagens = get_flashed_messages() %}
+                {% if mensagens %}
+                    {% for m in mensagens %}
+                        <div class="aviso" role="status">{{ m }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="tabs" role="tablist" aria-label="Tipos de item do catálogo">
+                <button class="tab is-active" role="tab" id="tab-livros" aria-controls="painel-livros" aria-selected="true" data-tab="livros">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    </svg>
+                    <span class="tab__nome">Livros <small>{{ livros|length }}</small></span>
+                </button>
+                <button class="tab" role="tab" id="tab-revistas" aria-controls="painel-revistas" aria-selected="false" tabindex="-1" data-tab="revistas">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z"/>
+                    </svg>
+                    <span class="tab__nome">Revistas <small>{{ revistas|length }}</small></span>
+                </button>
+                <button class="tab" role="tab" id="tab-discos" aria-controls="painel-discos" aria-selected="false" tabindex="-1" data-tab="discos">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    <span class="tab__nome">Discos <small>{{ discos|length }}</small></span>
+                </button>
+            </div>
+
+            <section class="tabpanel is-active" role="tabpanel" id="painel-livros" aria-labelledby="tab-livros" data-tab="livros">
+                <h2 class="tabpanel__titulo">Livros em destaque</h2>
+                {% if livros %}
+                    <div class="itens">
+                        {% for item in livros %}
+                            {{ item_card(item, item._autor, item._sinopse) }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="vazio">Ainda não há livros cadastrados.</p>
+                {% endif %}
+            </section>
+
+            <section class="tabpanel" role="tabpanel" id="painel-revistas" aria-labelledby="tab-revistas" data-tab="revistas" hidden>
+                <h2 class="tabpanel__titulo">Revistas em destaque</h2>
+                {% if revistas %}
+                    <div class="itens">
+                        {% for item in revistas %}
+                            {{ item_card(item, item._editora, item._periodicidade) }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="vazio">Ainda não há revistas cadastradas.</p>
+                {% endif %}
+            </section>
+
+            <section class="tabpanel" role="tabpanel" id="painel-discos" aria-labelledby="tab-discos" data-tab="discos" hidden>
+                <h2 class="tabpanel__titulo">Discos em destaque</h2>
+                {% if discos %}
+                    <div class="itens">
+                        {% for item in discos %}
+                            {{ item_card(item, item._artista, item._formato_midia) }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="vazio">Ainda não há discos cadastrados.</p>
+                {% endif %}
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__col">
+                <span class="footer__brand">Prateleira Digital</span>
+                <p>Sua estante aconchegante na internet.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Links úteis</h4>
+                <a href="{{ url_for('index') }}">Início</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <a href="mailto:prateleiradigital@email.com">prateleiradigital@email.com</a>
+                <div class="socials">
+                    <a href="#" aria-label="Instagram" class="socials__icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="footer__copy">© 2026 Prateleira Digital. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const abas = Array.from(document.querySelectorAll('.tab'));
+        const paineis = Array.from(document.querySelectorAll('.tabpanel'));
+
+        function ativar(aba, focar) {
+            abas.forEach(a => {
+                const ativa = a === aba;
+                a.classList.toggle('is-active', ativa);
+                a.setAttribute('aria-selected', ativa);
+                a.tabIndex = ativa ? 0 : -1;
+            });
+            paineis.forEach(p => {
+                const ativo = p.dataset.tab === aba.dataset.tab;
+                p.classList.toggle('is-active', ativo);
+                p.hidden = !ativo;
+            });
+            if (focar) aba.focus();
+        }
+
+        abas.forEach((aba, i) => {
+            aba.addEventListener('click', () => ativar(aba));
+            aba.addEventListener('keydown', e => {
+                if (e.key === 'ArrowRight') ativar(abas[(i + 1) % abas.length], true);
+                if (e.key === 'ArrowLeft') ativar(abas[(i - 1 + abas.length) % abas.length], true);
+            });
+        });
+    </script>
+
+</body>
+</html>

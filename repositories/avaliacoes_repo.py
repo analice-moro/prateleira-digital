@@ -16,7 +16,7 @@ def listar_por_loja(id_loja):
     cursor = conexao.cursor()
     cursor.execute(
         "SELECT nome_usuario, nota_avaliacao FROM avaliacoes WHERE id_loja = %s",
-        (id_loja)
+        (id_loja,)
     )
     linhas = cursor.fetchall()
     conexao.close()

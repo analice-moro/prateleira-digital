@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ loja.nome_loja }} | Prateleira Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lojas.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="{{ url_for('index') }}" class="logo">Prateleira Digital</a>
+            <nav class="navbar__links">
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pagina">
+        <div class="container">
+            <a href="{{ url_for('listar_lojas') }}" class="voltar">← Voltar às lojas</a>
+
+            <section class="loja-topo">
+                <div class="loja-topo__icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                    </svg>
+                </div>
+                <div class="loja-topo__info">
+                    <h1 class="loja-topo__nome">{{ loja.nome_loja }}</h1>
+                    <p class="loja-topo__cidade">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                                    </svg>
+                        {{ loja.cidade }}
+                    </p>
+                    <p class="loja-topo__media">
+                        {% if loja._avaliacoes %}
+                            <span class="star" aria-hidden="true">★</span>
+                            {{ '%.1f'|format(loja.media_avaliacoes) }}
+                            <small>({{ loja._avaliacoes|length }} {{ 'avaliação' if loja._avaliacoes|length == 1 else 'avaliações' }})</small>
+                        {% else %}
+                            <small>Sem avaliações ainda</small>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="loja-topo__acoes">
+                    <a href="{{ url_for('novo_item_catalogo', id_loja=loja.id) }}" class="btn">Adicionar produto</a>
+                    <a href="{{ url_for('avaliar_loja', id_loja=loja.id) }}" class="btn btn--outline">Avaliar</a>
+                </div>
+            </section>
+
+            <section aria-labelledby="titulo-avaliacoes">
+                <h2 class="secao-titulo" id="titulo-avaliacoes">Avaliações</h2>
+
+                {% if loja._avaliacoes %}
+                    <ul class="avaliacoes">
+                        {% for av in loja._avaliacoes %}
+                            {% set cheias = av._nota|round|int %}
+                            <li class="avaliacao">
+                                <span class="avaliacao__autor">{{ av._cliente }}</span>
+                                <span class="avaliacao__nota" role="img" aria-label="Nota {{ av._nota }} de 5">
+                                    {{ '★' * cheias }}{{ '☆' * (5 - cheias) }}
+                                    <small>{{ '%.1f'|format(av._nota) }}</small>
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty empty--esquerda">
+                        <p>Esta loja ainda não foi avaliada. Seja o primeiro a avaliar!</p>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__col">
+                <span class="footer__brand">Prateleira Digital</span>
+                <p>Sua estante aconchegante na internet.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Links úteis</h4>
+                <a href="{{ url_for('index') }}">Início</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <a href="mailto:prateleiradigital@email.com">prateleiradigital@email.com</a>
+                <div class="socials">
+                    <a href="#" aria-label="Instagram" class="socials__icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="footer__copy">© 2026 Prateleira Digital. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>

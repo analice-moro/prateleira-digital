@@ -22,7 +22,7 @@ def salvar_usuario(usuario):
     cursor.execute("""
         INSERT INTO usuarios (nome_usuario, email, senha_hash, is_admin)
         VALUES (%s, %s, %s, %s)
-    """, (usuario.nome, usuario.email, usuario._senha_hash, False))
+    """, (usuario.nome_usuario, usuario.email, usuario._senha_hash, False))
     conexao.commit()
     id_gerado = cursor.lastrowid
     conexao.close()
@@ -44,7 +44,7 @@ def buscar_por_email(email):
         return None
 
     id_usuario, nome, email, senha_hash, is_admin = linha
-    usuario = Usuario(nome, email, senha_hash, isadmin=bool(is_admin))
+    usuario = Usuario(nome, email, senha_hash, is_admin=bool(is_admin))
     usuario.id = id_usuario
     return usuario
 

@@ -1,0 +1,117 @@
+/* Lista de lojas e detalhe da loja — complementa landing.css (variáveis, navbar, botões, cards e rodapé) */
+
+.pagina { padding: 56px 0 80px; }
+
+.pagina__titulo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.2;
+    text-align: center;
+    margin-bottom: 8px;
+}
+.pagina__subtitulo {
+    text-align: center;
+    font-style: italic;
+    opacity: 0.85;
+    margin-bottom: 44px;
+}
+
+/* ---------- Cards clicáveis ---------- */
+.card--link { display: block; color: inherit; }
+.card--link:focus-visible,
+.btn:focus-visible,
+.voltar:focus-visible { outline: 3px solid rgba(200, 90, 50, 0.5); outline-offset: 3px; }
+
+.card__rating .nota-total { font-weight: 400; opacity: 0.7; font-size: 0.9rem; }
+
+/* ---------- Botões ---------- */
+.btn--outline {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    box-shadow: none;
+    padding: 7px 20px;
+}
+.btn--outline:hover { background: rgba(200, 90, 50, 0.1); box-shadow: none; }
+
+/* ---------- Detalhe da loja ---------- */
+.voltar {
+    display: inline-block;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.voltar:hover { color: var(--header); }
+
+.loja-topo {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: #fff;
+    border: 1px solid rgba(56, 38, 33, 0.08);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 28px 28px;
+    margin-bottom: 40px;
+}
+.loja-topo__icone {
+    width: 72px; height: 72px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    border-radius: 18px;
+    background: rgba(200, 90, 50, 0.12);
+    color: var(--accent);
+}
+.loja-topo__info { flex: 1 1 260px; }
+.loja-topo__nome {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+.loja-topo__cidade { display: flex; align-items: center; gap: 6px; opacity: 0.85; margin-bottom: 8px; }
+.loja-topo__cidade svg { color: var(--accent); flex-shrink: 0; }
+.loja-topo__media { font-weight: 600; }
+.loja-topo__media .star { color: var(--accent); font-size: 1.15rem; }
+.loja-topo__media small { font-weight: 400; opacity: 0.7; }
+
+.loja-topo__acoes { display: flex; gap: 12px; flex-wrap: wrap; }
+.loja-topo__acoes .btn { font-family: inherit; font-size: 1rem; }
+
+/* ---------- Avaliações ---------- */
+.secao-titulo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.avaliacoes { display: grid; gap: 16px; list-style: none; }
+
+.avaliacao {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #fff;
+    border: 1px solid rgba(56, 38, 33, 0.08);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    padding: 16px 20px;
+}
+.avaliacao__autor { font-weight: 600; }
+.avaliacao__nota { white-space: nowrap; color: var(--accent); font-size: 1.1rem; letter-spacing: 2px; }
+.avaliacao__nota small { color: var(--text); letter-spacing: 0; font-size: 0.9rem; margin-left: 6px; opacity: 0.75; }
+
+.empty--esquerda { margin: 0; max-width: none; text-align: center; }
+
+@media (max-width: 520px) {
+    .pagina { padding: 36px 0 56px; }
+    .loja-topo { padding: 22px 18px; }
+    .loja-topo__acoes { width: 100%; }
+    .loja-topo__acoes .btn { flex: 1; text-align: center; }
+    .avaliacao { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
