@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar produto | Prateleira Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='formulario.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="{{ url_for('index') }}" class="logo">Prateleira Digital</a>
+            <nav class="navbar__links">
+                <a href="{{ url_for('listar_lojas') }}">Lojas</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth">
+        <section class="auth__card auth__card--larga">
+            <div class="auth__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+            <h1 class="auth__title">Adicionar produto</h1>
+            <p class="auth__subtitle">{{ loja.nome_loja }} · {{ loja.cidade }}</p>
+
+            {% if erro %}
+                <div class="auth__error" role="alert">{{ erro }}</div>
+            {% endif %}
+
+            {% set d = dados or {} %}
+            <form method="POST" action="{{ url_for('novo_item_catalogo', id_loja=loja.id) }}" enctype="multipart/form-data" class="form" id="form-item">
+                <div class="form__group">
+                    <label for="tipo">Tipo de produto</label>
+                    <select id="tipo" name="tipo" required>
+                        <option value="" disabled {% if not d.get('tipo') %}selected{% endif %}>Escolha uma opção</option>
+                        <option value="Livro" {% if d.get('tipo') == 'Livro' %}selected{% endif %}>Livro</option>
+                        <option value="Revista" {% if d.get('tipo') == 'Revista' %}selected{% endif %}>Revista</option>
+                        <option value="Disco" {% if d.get('tipo') == 'Disco' %}selected{% endif %}>Disco</option>
+                    </select>
+                </div>
+
+                <div class="form__group">
+                    <label for="titulo">Título</label>
+                    <input type="text" id="titulo" name="titulo" maxlength="100" value="{{ d.get('titulo', '') }}" placeholder="Ex.: Dom Casmurro" required>
+                </div>
+
+                <div class="form__linha">
+                    <div class="form__group">
+                        <label for="genero">Gênero</label>
+                        <input type="text" id="genero" name="genero" maxlength="30" value="{{ d.get('genero', '') }}" placeholder="Ex.: Romance" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="ano_lancamento">Ano de lançamento</label>
+                        <input type="number" id="ano_lancamento" name="ano_lancamento" min="1" max="9999" value="{{ d.get('ano_lancamento', '') }}" placeholder="Ex.: 1899" required>
+                    </div>
+                </div>
+
+                <div class="form__group">
+                    <label for="preco">Preço (R$)</label>
+                    <input type="number" id="preco" name="preco" min="0" step="0.01" inputmode="decimal" value="{{ d.get('preco', '') }}" placeholder="Ex.: 39,90" required>
+                </div>
+
+                <fieldset class="form__detalhes" data-tipo="Livro" disabled>
+                    <div class="form__group">
+                        <label for="autor">Autor</label>
+                        <input type="text" id="autor" name="autor" maxlength="100" value="{{ d.get('autor', '') }}" placeholder="Ex.: Machado de Assis" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="sinopse">Sinopse <span class="form__ajuda">(opcional)</span></label>
+                        <textarea id="sinopse" name="sinopse" maxlength="255" placeholder="Conte em poucas linhas sobre o que é o livro">{{ d.get('sinopse', '') }}</textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form__detalhes" data-tipo="Revista" disabled>
+                    <div class="form__group">
+                        <label for="editora">Editora</label>
+                        <input type="text" id="editora" name="editora" maxlength="50" value="{{ d.get('editora', '') }}" placeholder="Ex.: Abril" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="periodicidade">Periodicidade</label>
+                        <select id="periodicidade" name="periodicidade" required>
+                            <option value="" disabled {% if not d.get('periodicidade') %}selected{% endif %}>Escolha uma opção</option>
+                                <option value="Semanal" {% if d.get('periodicidade') == 'Semanal' %}selected{% endif %}>Semanal</option>
+                                <option value="Quinzenal" {% if d.get('periodicidade') == 'Quinzenal' %}selected{% endif %}>Quinzenal</option>
+                                <option value="Mensal" {% if d.get('periodicidade') == 'Mensal' %}selected{% endif %}>Mensal</option>
+                                <option value="Bimestral" {% if d.get('periodicidade') == 'Bimestral' %}selected{% endif %}>Bimestral</option>
+                                <option value="Trimestral" {% if d.get('periodicidade') == 'Trimestral' %}selected{% endif %}>Trimestral</option>
+                                <option value="Anual" {% if d.get('periodicidade') == 'Anual' %}selected{% endif %}>Anual</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form__detalhes" data-tipo="Disco" disabled>
+                    <div class="form__group">
+                        <label for="artista">Artista</label>
+                        <input type="text" id="artista" name="artista" maxlength="100" value="{{ d.get('artista', '') }}" placeholder="Ex.: Elis Regina" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="formato_midia">Formato</label>
+                        <select id="formato_midia" name="formato_midia" required>
+                            <option value="" disabled {% if not d.get('formato_midia') %}selected{% endif %}>Escolha uma opção</option>
+                                <option value="Vinil" {% if d.get('formato_midia') == 'Vinil' %}selected{% endif %}>Vinil</option>
+                                <option value="CD" {% if d.get('formato_midia') == 'CD' %}selected{% endif %}>CD</option>
+                                <option value="Fita cassete" {% if d.get('formato_midia') == 'Fita cassete' %}selected{% endif %}>Fita cassete</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <div class="form__group">
+                    <label for="imagem">Imagem da capa</label>
+                    <input type="file" id="imagem" name="imagem" accept="image/png,image/jpeg,image/webp,image/gif" required>
+                    <span class="form__ajuda">PNG, JPG, WEBP ou GIF, até 8 MB.</span>
+                </div>
+
+                <div class="form__acoes">
+                    <button type="submit" class="btn btn--block">Adicionar ao catálogo</button>
+                    <a href="{{ url_for('loja_detalhe', id_loja=loja.id) }}" class="btn btn--outline">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__col">
+                <span class="footer__brand">Prateleira Digital</span>
+                <p>Sua estante aconchegante na internet.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Links úteis</h4>
+                <a href="{{ url_for('index') }}">Início</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <a href="mailto:prateleiradigital@email.com">prateleiradigital@email.com</a>
+                <div class="socials">
+                    <a href="#" aria-label="Instagram" class="socials__icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="footer__copy">© 2026 Prateleira Digital. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const tipo = document.getElementById('tipo');
+        const grupos = document.querySelectorAll('.form__detalhes');
+
+        function mostrarCampos() {
+            grupos.forEach(g => { g.disabled = g.dataset.tipo !== tipo.value; });
+        }
+        tipo.addEventListener('change', mostrarCampos);
+        mostrarCampos();
+    </script>
+
+</body>
+</html>

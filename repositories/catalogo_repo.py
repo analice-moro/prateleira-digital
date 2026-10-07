@@ -79,7 +79,7 @@ def listar_por_loja(id_loja):
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        SELECT titulo_item, genero_item, ano_lancamento_item, preco_item, tipo_item, caminho_img_item, imagem_item, autor_item, sinopse_item, artista_item, formato_midia_item, editora_item, periodicidade_item 
+        SELECT id, titulo_item, genero_item, ano_lancamento_item, preco_item, tipo_item, autor_item, sinopse_item, artista_item, formato_midia_item, editora_item, periodicidade_item 
         FROM itens_catalogo
         WHERE id_loja = %s
     """, (id_loja,))
@@ -87,17 +87,19 @@ def listar_por_loja(id_loja):
     conexao.close()
 
     itens = []
-    for titulo, genero, ano_lancamento, preco, tipo_item, caminho_img, imagem, autor, sinopse, artista, formato_midia, editora, periodicidade in linhas:
+    for id_item, titulo, genero, ano_lancamento, preco, tipo_item, autor, sinopse, artista, formato_midia, editora, periodicidade in linhas:
         preco = float(preco)
         if tipo_item == "Livro":
-            img = reconstruir_imagem(caminho_img, imagem)
-            itens.append(Livro(titulo, autor, ano_lancamento, genero, preco, sinopse, img))
+            item = Livro(titulo, autor, ano_lancamento, genero, preco, sinopse, None)
         elif tipo_item == "Disco":
-            img = reconstruir_imagem(caminho_img, imagem)
-            itens.append(Disco(titulo, artista, ano_lancamento, genero, formato_midia, preco, img))
+            item = Disco(titulo, artista, ano_lancamento, genero, formato_midia, preco, None)
         elif tipo_item == "Revista":
-            img = reconstruir_imagem(caminho_img, imagem)
-            itens.append(Revista(titulo, editora, ano_lancamento, genero, periodicidade, preco, img))
+            item = Revista(titulo, editora, ano_lancamento, genero, periodicidade, preco, None)
+
+        item.id = id_item
+        item.id_loja = id_loja
+        itens.append(item)
+
     return itens
 
 def reconstruir_imagem(caminho_img, imagem):
@@ -111,7 +113,7 @@ def listar_todos():
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        SELECT itens_catalogo.id, itens_catalogo.id_loja, lojas.nome_loja, itens_catalogo.titulo_item, itens_catalogo.genero_item, itens_catalogo.ano_lancamento_item, itens_catalogo.preco_item, itens_catalogo.tipo_item, itens_catalogo.autor_item, itens_catalogo.sinopse_item, itens_catalogo.artista_item, itens_catalogo.formato_midia_item, itens_catalogo.editora_item, itens_catalogo.editora_item 
+        SELECT itens_catalogo.id, itens_catalogo.id_loja, lojas.nome_loja, itens_catalogo.titulo_item, itens_catalogo.genero_item, itens_catalogo.ano_lancamento_item, itens_catalogo.preco_item, itens_catalogo.tipo_item, itens_catalogo.autor_item, itens_catalogo.sinopse_item, itens_catalogo.artista_item, itens_catalogo.formato_midia_item, itens_catalogo.editora_item, itens_catalogo.periodicidade_item 
         FROM itens_catalogo 
         JOIN lojas ON lojas.id = itens_catalogo.id_loja
         WHERE lojas.status = 'Ativo' 
@@ -147,3 +149,35 @@ def buscar_imagem(id_item):
     if linha is None or not linha[0]:
         return None
     return linha[0], linha[1]
+
+def buscar_por_id(id_item):
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        SELECT id, id_loja, titulo_item, genero_item, ano_lancamento_item, preco_item, tipo_item,
+               autor_item, sinopse_item, artista_item, formato_midia_item, editora_item, periodicidade_item
+        FROM itens_catalogo
+        WHERE id = %s
+    """, (id_item,))
+    resultado = cursor.fetchone()
+    conexao.close()
+
+    if resultado is None:
+        return None
+
+    id_item, id_loja, titulo, genero, ano_lancamento, preco, tipo_item, autor, sinopse, artista, formato_midia, editora, periodicidade = resultado
+    preco = float(preco)
+
+    if tipo_item == "Livro":
+        item = Livro(titulo, autor, ano_lancamento, genero, preco, sinopse, None)
+    elif tipo_item == "Disco":
+        item = Disco(titulo, artista, ano_lancamento, genero, formato_midia, preco, None)
+    elif tipo_item == "Revista":
+        item = Revista(titulo, editora, ano_lancamento, genero, periodicidade, preco, None)
+    else:
+        return None  # tipo desconhecido: evita usar uma variável que não existe
+
+    item.id = id_item
+    item.id_loja = id_loja
+    return item
+    

@@ -1,0 +1,100 @@
+/* Telas de administração — complementa landing.css (variáveis, navbar, botões, cards e rodapé) */
+
+:root {
+    --status-ativo: #3B625B;
+    --status-pendente: #B7791F;
+    --status-outro: #8C4356;
+}
+
+.admin { padding: 48px 0 80px; }
+
+.admin__titulo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+.admin__subtitulo { font-style: italic; opacity: 0.85; margin-bottom: 28px; }
+
+/* ---------- Sub-navegação ---------- */
+.subnav { display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
+.subnav a {
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+    transition: background .15s ease;
+}
+.subnav a:hover { background: rgba(200, 90, 50, 0.1); }
+.subnav a[aria-current="page"] { background: var(--accent); color: #FDFBF7; }
+.subnav a:focus-visible, .btn:focus-visible, .admin select:focus-visible {
+    outline: 3px solid rgba(200, 90, 50, 0.5); outline-offset: 2px;
+}
+
+/* ---------- Selos de status ---------- */
+.badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--status-outro);
+}
+.badge--ativo { background: var(--status-ativo); }
+.badge--pendente { background: var(--status-pendente); }
+
+/* ---------- Cards de pendentes ---------- */
+.card__acoes { margin-top: 18px; }
+.card__acoes form { display: block; }
+.btn--botao { border: none; cursor: pointer; font-family: inherit; font-size: 1rem; width: 100%; }
+.card .badge { margin-bottom: 12px; }
+
+/* ---------- Tabela de todas as lojas ---------- */
+.tabela {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+.tabela th, .tabela td { padding: 14px 18px; text-align: left; vertical-align: middle; }
+.tabela thead th {
+    background: var(--header);
+    color: #FDFBF7;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1rem;
+}
+.tabela tbody tr + tr td { border-top: 1px solid rgba(56, 38, 33, 0.08); }
+.tabela__nome { font-weight: 600; }
+
+.form-status { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.form-status select {
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1.5px solid rgba(56, 38, 33, 0.25);
+    border-radius: 12px;
+    padding: 8px 12px;
+}
+.form-status .btn { padding: 7px 18px; border: none; cursor: pointer; font-family: inherit; font-size: 0.95rem; }
+
+/* ---------- Responsivo: tabela vira lista de cartões ---------- */
+@media (max-width: 720px) {
+    .tabela thead { display: none; }
+    .tabela, .tabela tbody, .tabela tr, .tabela td { display: block; width: 100%; }
+    .tabela tbody tr { padding: 14px 6px; }
+    .tabela tbody tr + tr { border-top: 1px solid rgba(56, 38, 33, 0.08); }
+    .tabela tbody tr + tr td { border-top: none; }
+    .tabela td { padding: 6px 14px; }
+    .tabela td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.8rem;
+        opacity: 0.65;
+    }
+}

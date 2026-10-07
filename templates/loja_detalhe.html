@@ -26,6 +26,12 @@
         <div class="container">
             <a href="{{ url_for('listar_lojas') }}" class="voltar">← Voltar às lojas</a>
 
+            {% with mensagens = get_flashed_messages() %}
+                {% for m in mensagens %}
+                    <div class="aviso" role="status">{{ m }}</div>
+                {% endfor %}
+            {% endwith %}
+
             <section class="loja-topo">
                 <div class="loja-topo__icone" aria-hidden="true">
                     <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -52,7 +58,8 @@
                     </p>
                 </div>
                 <div class="loja-topo__acoes">
-                    <a href="{{ url_for('novo_item_catalogo', id_loja=loja.id) }}" class="btn">Adicionar produto</a>
+                    <a href="{{ url_for('listar_catalogo', id_loja=loja.id) }}" class="btn">Ver produtos</a>
+                    <a href="{{ url_for('novo_item_catalogo', id_loja=loja.id) }}" class="btn btn--outline">Adicionar produto</a>
                     <a href="{{ url_for('avaliar_loja', id_loja=loja.id) }}" class="btn btn--outline">Avaliar</a>
                 </div>
             </section>

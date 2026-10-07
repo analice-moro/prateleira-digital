@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lojas pendentes | Prateleira Digital</title>
+    <title>Todas as lojas | Prateleira Digital</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -25,44 +25,51 @@
 
     <main class="admin">
         <div class="container">
-            <h1 class="admin__titulo">Lojas pendentes</h1>
-            <p class="admin__subtitulo">Aprove as lojas para que apareçam no site.</p>
+            <h1 class="admin__titulo">Todas as lojas</h1>
+            <p class="admin__subtitulo">Veja todas as lojas e altere o status de cada uma.</p>
 
             <nav class="subnav" aria-label="Seções de administração">
-                <a href="{{ url_for('admin_pendentes') }}" aria-current="page">Pendentes</a>
-                <a href="{{ url_for('admin_lojas') }}">Todas as lojas</a>
+                <a href="{{ url_for('admin_pendentes') }}">Pendentes</a>
+                <a href="{{ url_for('admin_lojas') }}" aria-current="page">Todas as lojas</a>
             </nav>
 
             {% if lojas %}
-                <div class="cards">
-                    {% for loja in lojas %}
-                        <article class="card">
-                            <div class="card__icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="m3 9 1-5h16l1 5"/><path d="M4 9v11h16V9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M10 20v-6h4v6"/>
-                                </svg>
-                            </div>
-                            <span class="badge badge--pendente">{{ loja.status }}</span>
-                            <h2 class="card__name">{{ loja.nome_loja }}</h2>
-                            <p class="card__city">
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-                                </svg>
-                                {{ loja.cidade }}
-                            </p>
-                            <div class="card__acoes">
-                                <form method="POST" action="{{ url_for('admin_atualizar_status', id_loja=loja.id) }}">
-                                    <input type="hidden" name="status" value="Ativo">
-                                    <input type="hidden" name="origem" value="admin_pendentes">
-                                    <button type="submit" class="btn btn--botao">Aprovar loja</button>
-                                </form>
-                            </div>
-                        </article>
-                    {% endfor %}
-                </div>
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th scope="col">Loja</th>
+                            <th scope="col">Cidade</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Alterar status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loja in lojas %}
+                            <tr>
+                                <td class="tabela__nome" data-label="Loja">{{ loja.nome_loja }}</td>
+                                <td data-label="Cidade">{{ loja.cidade }}</td>
+                                <td data-label="Status">
+                                    <span class="badge {% if loja.status == 'Ativo' %}badge--ativo{% elif loja.status == 'Pendente' %}badge--pendente{% endif %}">{{ loja.status }}</span>
+                                </td>
+                                <td data-label="Alterar status">
+                                    <form method="POST" action="{{ url_for('admin_atualizar_status', id_loja=loja.id) }}" class="form-status">
+                                        <input type="hidden" name="origem" value="admin_lojas">
+                                        <label class="sr-only" for="status-{{ loja.id }}">Novo status de {{ loja.nome_loja }}</label>
+                                        <select name="status" id="status-{{ loja.id }}">
+                                            {% for s in status_validos %}
+                                                <option value="{{ s }}" {% if s == loja.status %}selected{% endif %}>{{ s }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn">Salvar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
                 <div class="empty">
-                    <p>Nenhuma loja aguardando aprovação.</p>
+                    <p>Ainda não há lojas cadastradas.</p>
                 </div>
             {% endif %}
         </div>

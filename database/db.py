@@ -23,16 +23,31 @@ def tabela_loja():
     conexao.commit()
     conexao.close()
 
-def tabela_avaliacao():
+def tabela_avaliacao_loja():
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS avaliacoes(
+        CREATE TABLE IF NOT EXISTS avaliacoes_lojas(
             id INT AUTO_INCREMENT PRIMARY KEY,
             id_loja INT,
             nome_usuario VARCHAR(100) NOT NULL,
             nota_avaliacao DECIMAL(2,1),
             FOREIGN KEY (id_loja) REFERENCES lojas(id)
+        )
+    """)
+    conexao.commit()
+    conexao.close()
+
+def tabela_avaliacao_item():
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS avaliacoes_itens(
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            id_item INT,
+            nome_usuario VARCHAR(100) NOT NULL,
+            nota_avaliacao DECIMAL (2,1),
+            FOREIGN KEY (id_item) REFERENCES itens_catalogo(id)
         )
     """)
     conexao.commit()
@@ -59,20 +74,41 @@ def listar_lojas():
     conexao.commit()
     conexao.close()
 
-def criar_avaliacao(id_loja, nome_usuario, nota_avaliacao):
+def criar_avaliacao_loja(id_loja, nome_usuario, nota_avaliacao):
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        INSERT INTO avaliacoes(id_loja, nome_usuario, nota_avaliacao) VALUES (%s, %s, %s)
+        INSERT INTO avaliacoes_lojas(id_loja, nome_usuario, nota_avaliacao) VALUES (%s, %s, %s)
     """, (int(id_loja), nome_usuario, float(nota_avaliacao)))
     conexao.commit()
     conexao.close()
 
-def listar_avaliacoes():
+def listar_avaliacoes_loja():
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        SELECT avaliacoes.id, lojas.nome_loja, avaliacoes.nome_usuario, avaliacoes.nota_avaliacao FROM avaliacoes JOIN lojas ON avaliacoes.id_loja = lojas.id
+        SELECT avaliacoes_lojas.id, lojas.nome_loja, avaliacoes_lojas.nome_usuario, avaliacoes_lojas.nota_avaliacao FROM avaliacoes_lojas JOIN lojas ON avaliacoes_lojas.id_loja = lojas.id
+    """)
+    avaliacoes = cursor.fetchall()
+    for avaliacao in avaliacoes:
+        print(avaliacao)
+    conexao.commit()
+    conexao.close()
+
+def criar_avaliacao_item(id_item, nome_usuario, nota_avaliacao):
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        INSERT INTO avaliacoes_itens(id_item, nome_usuario, nota_avaliacao) VALUES (%s, %s, %s)
+    """, (int(id_item), nome_usuario, float(nota_avaliacao)))
+    conexao.commit()
+    conexao.close()
+
+def listar_avaliacoes_item():
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        SELECT avaliacoes_itens.id, itens_catalogo._titulo_item, avaliacoes_itens.nome_usuario, avaliacoes_itens.nota_avaliacao FROM avaliacoes_itens JOIN itens_catalogo ON avaliacoes_itens.id_item = itens_catalogo.id 
     """)
     avaliacoes = cursor.fetchall()
     for avaliacao in avaliacoes:

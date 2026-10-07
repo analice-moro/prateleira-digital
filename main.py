@@ -1,10 +1,11 @@
 from functools import wraps
 import mimetypes
 
-from flask import Flask, render_template, request, redirect, url_for, session, Response, flash
+from flask import Flask, render_template, request, redirect, url_for, session, Response, flash, abort
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
-from database.db import tabela_loja, tabela_avaliacao
+from database.db import tabela_loja, tabela_avaliacao_loja, tabela_avaliacao_item
 from models.usuario import Usuario
 from models.loja import Loja
 from models.item_catalogo.livro import Livro
@@ -19,6 +20,9 @@ from repositories import admin_repo
 
 app = Flask(__name__)
 app.secret_key = "3itaQue-ch4veDlfic1l"
+
+def normalizar(texto):
+    return ' '.join((texto or '').split())
 
 @app.context_processor
 def injetar_usuario_atual():
@@ -116,6 +120,8 @@ def catalogo():
 @login_required
 def imagem_item(id_item):
     resultado = catalogo_repo.buscar_imagem(id_item)
+    if resultado is None:
+        abort(404)
 
     dados, caminho = resultado
     tipo_img = mimetypes.guess_type(caminho or '')[0] or 'image/jpeg'
@@ -126,16 +132,22 @@ def imagem_item(id_item):
 @login_required
 def cadastrar_loja():
     if request.method == 'POST':
-        nome_loja = request.form['nome_loja'].strip()
-        cidade = request.form['cidade'].strip()
-
+        nome_loja = normalizar(request.form['nome_loja'])
+        cidade = normalizar(request.form['cidade'])
+ 
         if not nome_loja or not cidade:
-            return render_template('cadastrar_loja.html', erro = "Preencha o nome e a cidade da loja")
-
+            return render_template('cadastrar_loja.html', erro="Preencha o nome e a cidade da loja",
+                                   nome_loja=nome_loja, cidade=cidade)
+ 
+        if loja_repo.buscar_por_nome_e_cidade(nome_loja, cidade) is not None:
+            return render_template('cadastrar_loja.html',
+                                   erro=f'Já existe uma loja chamada "{nome_loja}" em {cidade}.',
+                                   nome_loja=nome_loja, cidade=cidade)
+ 
         loja_repo.salvar_loja(Loja(nome_loja, cidade))
         flash('Loja cadastrada! Ela aparecerá no site assim que for aprovada.')
         return redirect(url_for('painel'))
-
+ 
     return render_template('cadastrar_loja.html')
 
 # Listar Lojas
@@ -160,14 +172,14 @@ def loja_detalhe(id_loja):
 def avaliar_loja(id_loja):
     loja = loja_repo.buscar_por_id(id_loja)
     if loja is None:
-        return redirect(url_for('lojas'))
+        return redirect(url_for('listar_lojas'))
 
     if request.method == 'POST':
-        cliente = request.form['cliente']
+        cliente = session['usuario_id']
         nota = float(request.form['nota'])
 
         avaliacao = Avaliacoes(cliente, nota)
-        avaliacoes_repo.salvar_avaliacao(id_loja, avaliacao)
+        avaliacoes_repo.salvar_avaliacao_loja(id_loja, avaliacao)
         return redirect(url_for('listar_avaliacoes', id_loja=id_loja))
 
     return render_template('avaliar.html', loja=loja)
@@ -195,7 +207,12 @@ def listar_catalogo(id_loja):
     revistas = [item for item in itens if isinstance(item, Revista)]
     discos = [item for item in itens if isinstance(item, Disco)]
 
-    return render_template('catalogo.html', loja=loja, livros=livros, revistas=revistas, dsicos=discos)
+    return render_template('catalogo.html', loja=loja, livros=livros, revistas=revistas, discos=discos)
+
+# Detalhes de um produto de determinada loja
+# @app.route('/loja/<int:id_loja>/catalogo/<int:id_item>')
+# @login_required
+# def item_detalhes(id_loja, id_item):
 
 
 @app.route('/admin')
@@ -230,13 +247,37 @@ def novo_item_catalogo(id_loja):
     if loja is None:
         return redirect(url_for('listar_lojas'))
 
+    def erro(mensagem):
+        return render_template('catalogo_novo.html', loja=loja, erro = mensagem, dados=request.form)
+
     if request.method == 'POST':
         tipo = request.form['tipo']
         titulo = request.form['titulo']
-        ano_lancamento = request.form['ano_lancamento']
         genero = request.form['genero']
-        preco = float(request.form['preco'])
-        imagem = request.form['imagem']
+
+        if tipo not in ('Livro', 'Revista', 'Disco'):
+            return erro('Escolha o tipo do item')
+        if not titulo or not genero:
+            return erro('Preencha o título e o gênero')
+
+        try:
+            ano_lancamento = int(request.form.get('ano_lancamento', ''))
+            preco = float(request.form.get('preco', '').replace(',', '.'))
+        except ValueError:
+            return erro('Informe um ano e preço válidos')
+        if not 1 <= ano_lancamento <= 99999 or preco < 0:
+            return erro('Informe um ano e preço válidos')
+
+        arquivo = request.files.get('imagem')
+        if arquivo is None or not arquivo.filename:
+            return erro('Envie uma imagem de capa')
+
+        if arquivo is None or not arquivo.filename:
+            return render_template('catalogo_novo.html', loja=loja, erro = "Envie uma imagem de capa")
+
+        imagem = arquivo.read()
+        if not imagem:
+            return erro('O arquivo de imagem está vazio')
 
         if tipo == "Livro":
             item = Livro(titulo, request.form.get('autor', ''), ano_lancamento, genero, preco, request.form.get('sinopse', ''), imagem)
@@ -247,14 +288,17 @@ def novo_item_catalogo(id_loja):
         else:
             return render_template('catalogo_novo.html', loja = loja, erro='Tipo de item inválido')
 
+        item.nome_arquivo = secure_filename(arquivo.filename)[-100:]
         catalogo_repo.salvar_item(id_loja, item)
+        flash('Produto cadastrado ao catálogo!')
         return redirect(url_for('listar_catalogo', id_loja=id_loja))
 
     return render_template('catalogo_novo.html', loja=loja)
 
 if __name__ == '__main__':
     tabela_loja()
-    tabela_avaliacao()
+    tabela_avaliacao_loja()
+    tabela_avaliacao_item()
     catalogo_repo.tabela_catalogo()
     usuario_repo.tabela_usuario()
     admin_repo.tabela_admin()

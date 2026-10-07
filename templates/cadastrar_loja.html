@@ -40,11 +40,11 @@
             <form method="POST" action="{{ url_for('cadastrar_loja') }}" class="form">
                 <div class="form__group">
                     <label for="nome_loja">Nome da loja</label>
-                    <input type="text" id="nome_loja" name="nome_loja" placeholder="Ex.: Sebo do Zé" required>
+                    <input type="text" id="nome_loja" name="nome_loja" placeholder="Ex.: Sebo do Zé" value="{{ nome_loja or '' }}" maxlength="100" required>
                 </div>
                 <div class="form__group">
                     <label for="cidade">Cidade</label>
-                    <input type="text" id="cidade" name="cidade" placeholder="Ex.: Curitiba" required>
+                    <input type="text" id="cidade" name="cidade" placeholder="Ex.: Curitiba" value="{{ cidade or '' }}" maxlength="100" required>
                 </div>
                 <button type="submit" class="btn btn--block">Enviar para aprovação</button>
             </form>

@@ -34,6 +34,28 @@ def buscar_por_nome(nome_loja):
     loja.id = id_loja
     return loja
 
+def buscar_por_nome_e_cidade(nome_loja, cidade):
+    """Procura uma loja com o mesmo nome na mesma cidade, ignorando maiúsculas e espaços nas pontas."""
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        SELECT id, nome_loja, cidade, status FROM lojas
+        WHERE LOWER(TRIM(nome_loja)) = LOWER(TRIM(%s))
+          AND LOWER(TRIM(cidade)) = LOWER(TRIM(%s))
+        LIMIT 1
+    """, (nome_loja, cidade))
+    resultado = cursor.fetchone()
+    conexao.close()
+ 
+    if resultado is None:
+        return None
+ 
+    id_loja, nome_loja, cidade, status = resultado
+    loja = Loja(nome_loja, cidade)
+    loja.definir_status(status)
+    loja.id = id_loja
+    return loja
+
 def buscar_por_id(id_loja):
     conexao = conectar()
     cursor = conexao.cursor()
