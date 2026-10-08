@@ -28,6 +28,12 @@
             <h1 class="admin__titulo">Todas as lojas</h1>
             <p class="admin__subtitulo">Veja todas as lojas e altere o status de cada uma.</p>
 
+            {% with mensagens = get_flashed_messages() %}
+                {% for m in mensagens %}
+                    <div class="aviso" role="status">{{ m }}</div>
+                {% endfor %}
+            {% endwith %}
+
             <nav class="subnav" aria-label="Seções de administração">
                 <a href="{{ url_for('admin_pendentes') }}">Pendentes</a>
                 <a href="{{ url_for('admin_lojas') }}" aria-current="page">Todas as lojas</a>
@@ -41,6 +47,7 @@
                             <th scope="col">Cidade</th>
                             <th scope="col">Status</th>
                             <th scope="col">Alterar status</th>
+                            <th scope="col">Remover</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,6 +68,12 @@
                                             {% endfor %}
                                         </select>
                                         <button type="submit" class="btn">Salvar</button>
+                                    </form>
+                                </td>
+                                <td data-label="Remover">
+                                    <form method="POST" action="{{ url_for('excluir_loja', id_loja=loja.id) }}"
+                                          onsubmit='return confirm({{ ("Remover a loja " ~ loja.nome_loja ~ " e todos os produtos e avaliações dela? Isso não pode ser desfeito.")|tojson }})'>
+                                        <button type="submit" class="btn btn--perigo">Remover loja</button>
                                     </form>
                                 </td>
                             </tr>

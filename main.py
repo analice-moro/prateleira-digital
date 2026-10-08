@@ -161,7 +161,7 @@ def listar_lojas():
 @app.route('/loja/<int:id_loja>')
 @login_required
 def loja_detalhe(id_loja):
-    loja = loja_repo.buscar_por_id(id_loja)
+    loja = loja_repo.buscar_com_avaliacoes(id_loja)
     if loja is None or loja.status != 'Ativo':
         return redirect(url_for('listar_lojas'))
     return render_template('loja_detalhe.html', loja=loja)
@@ -175,11 +175,18 @@ def avaliar_loja(id_loja):
         return redirect(url_for('listar_lojas'))
 
     if request.method == 'POST':
-        cliente = session['usuario_id']
-        nota = float(request.form['nota'])
+        try:
+            nota = float(request.form.get('nota', ''))
+        except ValueError:
+            nota = None
 
-        avaliacao = Avaliacoes(cliente, nota)
+        if nota is None or not 1 <= nota <= 5:
+            return render_template('avaliar.html', loja=loja, erro = "Escolha uma nota de 1 a 5 estrelas")
+        
+        usuario = usuario_repo.buscar_por_id(session['usuario_id'])
+        avaliacao = Avaliacoes(usuario.nome_usuario, nota)
         avaliacoes_repo.salvar_avaliacao_loja(id_loja, avaliacao)
+        flash('Avaliação enviada. Obrigado!')
         return redirect(url_for('listar_avaliacoes', id_loja=id_loja))
 
     return render_template('avaliar.html', loja=loja)
@@ -210,10 +217,40 @@ def listar_catalogo(id_loja):
     return render_template('catalogo.html', loja=loja, livros=livros, revistas=revistas, discos=discos)
 
 # Detalhes de um produto de determinada loja
-# @app.route('/loja/<int:id_loja>/catalogo/<int:id_item>')
-# @login_required
-# def item_detalhes(id_loja, id_item):
+@app.route('/item/<int:id_item>')
+@login_required
+def item_detalhe(id_item):
+    item = catalogo_repo.buscar_por_id(id_item)
+    if item is not None or item.status_loja != 'Ativo':
+        redirect(url_for('painel'))
 
+    avaliacoes = avaliacoes_repo.listar_por_item(id_item)
+    media = sum(avaliacao._nota for avaliacao in avaliacoes) / len(avaliacoes) if avaliacoes else 0
+    return render_template('item_detalhe.html', item=item, avaliacoes=avaliacoes, media=media)
+
+@app.route('/item/<int:id_item>/avaliar', methods= ['GET', 'POST'])
+@login_required
+def avaliar_item(id_item):
+    item = catalogo_repo.buscar_por_id(id_item)
+    if item is None or item.status_loja != 'Ativo':
+        return redirect(url_for('painel'))
+
+    if request.method == 'POST':
+        try:
+            nota = float(request.form.get('nota', ''))
+        except ValueError:
+            nota = None
+
+        if nota is None or not 1 <= nota <= 5:
+            return render_template('avaliar_item.html', item=item, erro = 'Escolha uma nota de 1 a 5 estrelas')
+
+        usuario = usuario_repo.buscar_por_id(session['usuario_id'])
+        avaliacao = Avaliacoes(usuario.nome_usuario, nota)
+        avaliacoes_repo.salvar_avaliacao_item(id_item, avaliacao)
+        flash('Avaliação enviada. Obrigado!')
+        return redirect(url_for('item_detalhe', id_item=id_item))
+
+    return render_template('avaliar_item.html', item=item)
 
 @app.route('/admin')
 @admin_required
@@ -295,11 +332,32 @@ def novo_item_catalogo(id_loja):
 
     return render_template('catalogo_novo.html', loja=loja)
 
+# Remover item do catálogo
+@app.route('/item/<int:id_item>/remover', methods=['POST'])
+@admin_required
+def excluir_item(id_item):
+    item = catalogo_repo.buscar_por_id(id_item)
+    if item is None:
+        redirect(url_for('painel'))
+
+    catalogo_repo.excluir_item(id_item)
+    flash('Produto removido')
+    return(url_for('listar_catalogo', id_loja=item.id_loja))
+
+# Remover loja
+@app.route('/admin/loja/<int:id_loja>/remover', methods=['POST'])
+@admin_required
+def excluir_loja(id_loja):
+    if loja_repo.buscar_por_id(id_loja) is not None:
+        loja_repo.excluir_loja(id_loja)
+        flash('Loja removida')
+    return redirect(url_for('admin_lojas'))
+
 if __name__ == '__main__':
     tabela_loja()
     tabela_avaliacao_loja()
-    tabela_avaliacao_item()
     catalogo_repo.tabela_catalogo()
+    tabela_avaliacao_item()
     usuario_repo.tabela_usuario()
     admin_repo.tabela_admin()
 

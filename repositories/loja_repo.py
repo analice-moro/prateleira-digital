@@ -116,6 +116,14 @@ def _carregar_avaliacoes(loja):
     for avaliacao in avaliacoes_repo.listar_por_loja(loja.id):
         loja._avaliacoes.append(avaliacao)
 
+def buscar_com_avaliacoes(id_loja):
+    loja = buscar_por_id(id_loja)
+    if loja is None:
+        return None
+
+    _carregar_avaliacoes(loja)
+    return loja
+
 def listar_completo(nome_loja):
 
     loja = buscar_por_nome(nome_loja)
@@ -149,3 +157,21 @@ def listar_por_status(status):
     for loja in lojas:
         _carregar_avaliacoes(loja)
     return lojas
+
+def excluir_loja(id_loja):
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        DELETE FROM avaliacoes_itens WHERE id_loja = %s
+    """, (id_loja,))
+    cursor.execute("""
+            DELETE FROM avaliacoes_lojas WHERE id_loja = %s
+        """, (id_loja,))
+    cursor.execute("""
+            DELETE FROM itens_catalogo WHERE id_loja = %s
+        """, (id_loja,))
+    cursor.execute("""
+            DELETE FROM lojas WHERE id = %s
+        """, (id_loja,))
+    conexao.commit()
+    conexao.close()

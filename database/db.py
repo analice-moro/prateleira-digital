@@ -108,7 +108,7 @@ def listar_avaliacoes_item():
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        SELECT avaliacoes_itens.id, itens_catalogo._titulo_item, avaliacoes_itens.nome_usuario, avaliacoes_itens.nota_avaliacao FROM avaliacoes_itens JOIN itens_catalogo ON avaliacoes_itens.id_item = itens_catalogo.id 
+        SELECT avaliacoes_itens.id, itens_catalogo.titulo_item, avaliacoes_itens.nome_usuario, avaliacoes_itens.nota_avaliacao FROM avaliacoes_itens JOIN itens_catalogo ON avaliacoes_itens.id_item = itens_catalogo.id 
     """)
     avaliacoes = cursor.fetchall()
     for avaliacao in avaliacoes:

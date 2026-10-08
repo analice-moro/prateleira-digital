@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliar produto | Prateleira Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='formulario.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="{{ url_for('index') }}" class="logo">Prateleira Digital</a>
+            <nav class="navbar__links">
+                <a href="{{ url_for('listar_lojas') }}">Lojas</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth">
+        <section class="auth__card">
+            <div class="auth__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></div>
+            <h1 class="auth__title">Avaliar produto</h1>
+            <p class="auth__loja">{{ item._titulo }}</p>
+            <p class="auth__subtitle">{{ item.tipo }} · {{ item.nome_loja }} · avaliando como {{ usuario_atual.nome_usuario if usuario_atual else 'visitante' }}</p>
+
+            {% if erro %}
+                <div class="auth__error" role="alert">{{ erro }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('avaliar_item', id_item=item.id) }}" class="form">
+                <fieldset class="estrelas">
+                    <legend>Qual nota você dá para este produto?</legend>
+                    <div class="estrelas__grupo">
+                            <input type="radio" id="nota-5" name="nota" value="5" required>
+                            <label for="nota-5" title="5 de 5" data-texto="Excelente"><span class="sr-only">5 de 5</span><span aria-hidden="true">★</span></label>
+                            <input type="radio" id="nota-4" name="nota" value="4">
+                            <label for="nota-4" title="4 de 5" data-texto="Muito boa"><span class="sr-only">4 de 5</span><span aria-hidden="true">★</span></label>
+                            <input type="radio" id="nota-3" name="nota" value="3">
+                            <label for="nota-3" title="3 de 5" data-texto="Boa"><span class="sr-only">3 de 5</span><span aria-hidden="true">★</span></label>
+                            <input type="radio" id="nota-2" name="nota" value="2">
+                            <label for="nota-2" title="2 de 5" data-texto="Regular"><span class="sr-only">2 de 5</span><span aria-hidden="true">★</span></label>
+                            <input type="radio" id="nota-1" name="nota" value="1">
+                            <label for="nota-1" title="1 de 5" data-texto="Ruim"><span class="sr-only">1 de 5</span><span aria-hidden="true">★</span></label>
+                    </div>
+                    <span class="estrelas__legenda" id="legenda-nota" aria-live="polite"></span>
+                </fieldset>
+                <div class="form__acoes">
+                    <button type="submit" class="btn btn--block">Enviar avaliação</button>
+                    <a href="{{ url_for('item_detalhe', id_item=item.id) }}" class="btn btn--outline">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__col">
+                <span class="footer__brand">Prateleira Digital</span>
+                <p>Sua estante aconchegante na internet.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Links úteis</h4>
+                <a href="{{ url_for('index') }}">Início</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <a href="mailto:prateleiradigital@email.com">prateleiradigital@email.com</a>
+                <div class="socials">
+                    <a href="#" aria-label="Instagram" class="socials__icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="footer__copy">© 2026 Prateleira Digital. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const legenda = document.getElementById('legenda-nota');
+        document.querySelectorAll('input[name="nota"]').forEach(r => {
+            r.addEventListener('change', () => {
+                legenda.textContent = document.querySelector('label[for="' + r.id + '"]').dataset.texto;
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -154,10 +154,9 @@ def buscar_por_id(id_item):
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute("""
-        SELECT id, id_loja, titulo_item, genero_item, ano_lancamento_item, preco_item, tipo_item,
-               autor_item, sinopse_item, artista_item, formato_midia_item, editora_item, periodicidade_item
-        FROM itens_catalogo
-        WHERE id = %s
+        SELECT itens_catalogo.id, itens_catalogo.id_loja, lojas.nome_loja, lojas.cidade, lojas.status, itens_catalogo.titulo_item, itens_catalogo.genero_item, itens_catalogo.ano_lancamento_item, itens_catalogo.preco_item, itens_catalogo.tipo_item, itens_catalogo.autor_item, itens_catalogo.sinopse_item, itens_catalogo.artista_item, itens_catalogo.formato_midia_item, itens_catalogo.editora_item, itens_catalogo.periodicidade_item
+        FROM itens_catalogo JOIN lojas ON lojas.id = itens_catalogo.id_loja
+        WHERE itens_catalogo.id = %s
     """, (id_item,))
     resultado = cursor.fetchone()
     conexao.close()
@@ -165,7 +164,7 @@ def buscar_por_id(id_item):
     if resultado is None:
         return None
 
-    id_item, id_loja, titulo, genero, ano_lancamento, preco, tipo_item, autor, sinopse, artista, formato_midia, editora, periodicidade = resultado
+    id_item, id_loja, nome_loja, cidade_loja, status_loja, titulo, genero, ano_lancamento, preco, tipo_item, autor, sinopse, artista, formato_midia, editora, periodicidade = resultado
     preco = float(preco)
 
     if tipo_item == "Livro":
@@ -179,5 +178,20 @@ def buscar_por_id(id_item):
 
     item.id = id_item
     item.id_loja = id_loja
+    item.nome_loja = nome_loja
+    item.cidade_loja = cidade_loja
+    item.status_loja = status_loja
+    item.tipo = tipo_item
     return item
     
+def excluir_item(id_item):
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        DELETE FROM avaliacoes_itens WHERE id_item = %s
+    """, (id_item,))
+    cursor.execute("""
+        DELETE FROM itens_catalogo WHERE id = %s
+    """, (id_item,))
+    conexao.commit()
+    conexao.close()

@@ -143,3 +143,76 @@
 }
 .catalogo-topo__cidade { opacity: 0.8; font-style: italic; }
 .link-add { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Detalhe do produto ---------- */
+.produto {
+    display: grid;
+    grid-template-columns: minmax(180px, 280px) 1fr;
+    gap: 32px;
+    background: #fff;
+    border: 1px solid rgba(56, 38, 33, 0.08);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 28px;
+    margin-bottom: 40px;
+}
+.produto__capa {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #EFE6D6;
+    display: grid;
+    place-items: center;
+    color: rgba(56, 38, 33, 0.35);
+    box-shadow: var(--shadow-soft);
+}
+.produto__capa--disco { aspect-ratio: 1 / 1; }
+.produto__capa img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.produto__info { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.produto__tipo {
+    padding: 3px 14px;
+    border-radius: 999px;
+    background: rgba(200, 90, 50, 0.12);
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.produto__titulo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    line-height: 1.2;
+}
+.produto__sub { font-weight: 600; }
+.produto__meta { opacity: 0.75; }
+.produto__texto { margin-top: 8px; font-style: italic; opacity: 0.9; max-width: 60ch; }
+.produto__preco { font-size: 1.7rem; font-weight: 700; color: var(--accent); margin-top: 8px; }
+.produto__loja { display: flex; align-items: center; gap: 6px; opacity: 0.85; margin: 6px 0 10px; }
+.produto__loja svg { color: var(--accent); flex-shrink: 0; }
+
+@media (max-width: 640px) {
+    .produto { grid-template-columns: 1fr; padding: 20px 18px; gap: 22px; }
+    .produto__capa { max-width: 240px; width: 100%; margin: 0 auto; }
+    .produto__info .loja-topo__acoes { width: 100%; }
+    .produto__info .loja-topo__acoes .btn { flex: 1; text-align: center; }
+}
+
+/* ---------- Remover produto (admin) ---------- */
+.item-wrap { display: flex; flex-direction: column; gap: 10px; }
+.item-wrap .item { flex: 1; }
+.btn-remover {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--header);
+    background: transparent;
+    border: 2px solid var(--header);
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+.btn-remover:hover { background: var(--header); color: #FDFBF7; }
+.btn-remover:focus-visible { outline: 3px solid rgba(139, 38, 40, 0.4); outline-offset: 2px; }

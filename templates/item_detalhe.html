@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ item._titulo }} | Prateleira Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='lojas.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="{{ url_for('index') }}" class="logo">Prateleira Digital</a>
+            <nav class="navbar__links">
+                <a href="{{ url_for('listar_lojas') }}">Lojas</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pagina">
+        <div class="container">
+            <a href="{{ url_for('listar_catalogo', id_loja=item.id_loja) }}" class="voltar">← Voltar aos produtos</a>
+
+            {% with mensagens = get_flashed_messages() %}
+                {% for m in mensagens %}
+                    <div class="aviso" role="status">{{ m }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            {% if item.tipo == 'Livro' %}
+                {% set subtitulo = item._autor %}{% set rotulo = 'Autor' %}
+            {% elif item.tipo == 'Revista' %}
+                {% set subtitulo = item._editora %}{% set rotulo = 'Editora' %}
+            {% else %}
+                {% set subtitulo = item._artista %}{% set rotulo = 'Artista' %}
+            {% endif %}
+
+            <section class="produto">
+                <figure class="produto__capa produto__capa--{{ item.tipo|lower }}">
+                    <svg class="produto__placeholder" viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>
+                    </svg>
+                    <img src="{{ url_for('imagem_item', id_item=item.id) }}" alt="Capa de {{ item._titulo }}" onerror="this.style.display='none'">
+                </figure>
+
+                <div class="produto__info">
+                    <span class="produto__tipo">{{ item.tipo }}</span>
+                    <h1 class="produto__titulo">{{ item._titulo }}</h1>
+                    {% if subtitulo %}<p class="produto__sub">{{ rotulo }}: {{ subtitulo }}</p>{% endif %}
+                    <p class="produto__meta">{{ item._genero }} · {{ item._ano_lancamento|int }}</p>
+
+                    {% if item.tipo == 'Livro' and item._sinopse %}
+                        <p class="produto__texto">{{ item._sinopse }}</p>
+                    {% elif item.tipo == 'Revista' and item._periodicidade %}
+                        <p class="produto__texto">Periodicidade: {{ item._periodicidade }}</p>
+                    {% elif item.tipo == 'Disco' and item._formato_midia %}
+                        <p class="produto__texto">Formato: {{ item._formato_midia }}</p>
+                    {% endif %}
+
+                    <p class="produto__preco">R$ {{ '%.2f'|format(item._preco)|replace('.', ',') }}</p>
+
+                    <p class="loja-topo__media">
+                        {% if avaliacoes %}
+                            <span class="star" aria-hidden="true">★</span>
+                            {{ '%.1f'|format(media) }}
+                            <small>({{ avaliacoes|length }} {{ 'avaliação' if avaliacoes|length == 1 else 'avaliações' }})</small>
+                        {% else %}
+                            <small>Sem avaliações ainda</small>
+                        {% endif %}
+                    </p>
+
+                    <p class="produto__loja">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Vendido por <strong>{{ item.nome_loja }}</strong> · {{ item.cidade_loja }}
+                    </p>
+
+                    <div class="loja-topo__acoes">
+                        <a href="{{ url_for('avaliar_item', id_item=item.id) }}" class="btn">Avaliar</a>
+                        <a href="{{ url_for('loja_detalhe', id_loja=item.id_loja) }}" class="btn btn--outline">Ver loja</a>
+                    </div>
+                </div>
+            </section>
+
+            <section aria-labelledby="titulo-avaliacoes">
+                <h2 class="secao-titulo" id="titulo-avaliacoes">Avaliações do produto</h2>
+
+                {% if avaliacoes %}
+                    <ul class="avaliacoes">
+                        {% for av in avaliacoes %}
+                            {% set cheias = av._nota|round|int %}
+                            <li class="avaliacao">
+                                <span class="avaliacao__autor">{{ av._cliente }}</span>
+                                <span class="avaliacao__nota" role="img" aria-label="Nota {{ av._nota }} de 5">
+                                    {{ '★' * cheias }}{{ '☆' * (5 - cheias) }}
+                                    <small>{{ '%.1f'|format(av._nota) }}</small>
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty empty--esquerda">
+                        <p>Este produto ainda não foi avaliado. Seja o primeiro a avaliar!</p>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__col">
+                <span class="footer__brand">Prateleira Digital</span>
+                <p>Sua estante aconchegante na internet.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Links úteis</h4>
+                <a href="{{ url_for('index') }}">Início</a>
+                <a href="{{ url_for('painel') }}">Painel</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <a href="mailto:prateleiradigital@email.com">prateleiradigital@email.com</a>
+                <div class="socials">
+                    <a href="#" aria-label="Instagram" class="socials__icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="footer__copy">© 2026 Prateleira Digital. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>
