@@ -73,8 +73,8 @@
                         <input type="text" id="autor" name="autor" maxlength="100" value="{{ d.get('autor', '') }}" placeholder="Ex.: Machado de Assis" required>
                     </div>
                     <div class="form__group">
-                        <label for="sinopse">Sinopse <span class="form__ajuda">(opcional)</span></label>
-                        <textarea id="sinopse" name="sinopse" maxlength="255" placeholder="Conte em poucas linhas sobre o que é o livro">{{ d.get('sinopse', '') }}</textarea>
+                        <label for="sinopse">Sinopse <span class="form__ajuda"></span></label>
+                        <textarea id="sinopse" name="sinopse" maxlength="255" placeholder="Conte em poucas linhas sobre o que é o livro" required>{{ d.get('sinopse', '') }}</textarea>
                     </div>
                 </fieldset>
 
@@ -108,7 +108,6 @@
                             <option value="" disabled {% if not d.get('formato_midia') %}selected{% endif %}>Escolha uma opção</option>
                                 <option value="Vinil" {% if d.get('formato_midia') == 'Vinil' %}selected{% endif %}>Vinil</option>
                                 <option value="CD" {% if d.get('formato_midia') == 'CD' %}selected{% endif %}>CD</option>
-                                <option value="Fita cassete" {% if d.get('formato_midia') == 'Fita cassete' %}selected{% endif %}>Fita cassete</option>
                         </select>
                     </div>
                 </fieldset>

@@ -1,14 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, Response, flash, abort
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-
-from database.db import tabela_loja, tabela_avaliacao_loja, tabela_avaliacao_item
-from models.usuario import Usuario
+from flask import render_template, request, redirect, url_for
 from models.loja import Loja
-from models.item_catalogo.livro import Livro
-from models.item_catalogo.discos import Disco
-from models.item_catalogo.revista import Revista
-from models.item_catalogo.avaliacoes import Avaliacoes
 from repositories import loja_repo
 
 # Listar lojas com status "Pendente"

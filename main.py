@@ -1,22 +1,9 @@
 from functools import wraps
-import mimetypes
 import os
 from dotenv import load_dotenv
-
-from flask import Flask, render_template, request, redirect, url_for, session, Response, flash, abort
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-
+from flask import Flask, redirect, url_for, session
 from database.db import tabela_loja, tabela_avaliacao_loja, tabela_avaliacao_item
-from models.usuario import Usuario
-from models.loja import Loja
-from models.item_catalogo.livro import Livro
-from models.item_catalogo.discos import Disco
-from models.item_catalogo.revista import Revista
-from models.item_catalogo.avaliacoes import Avaliacoes
-from repositories import loja_repo
 from repositories import usuario_repo
-from repositories import avaliacoes_repo
 from repositories import catalogo_repo
 from repositories import admin_repo
 from routes import admin_route, catalogo_route, lojas_route, painel_route
@@ -173,10 +160,9 @@ def excluir_loja(id_loja):
 
 if __name__ == '__main__':
     tabela_loja()
+    usuario_repo.tabela_usuario()  
     tabela_avaliacao_loja()
     catalogo_repo.tabela_catalogo()
     tabela_avaliacao_item()
-    usuario_repo.tabela_usuario()
-    admin_repo.tabela_admin()
 
     app.run(debug=True)

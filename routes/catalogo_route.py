@@ -1,9 +1,6 @@
 import mimetypes
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, Response
+from flask import render_template, request, redirect, url_for, session, flash, abort, Response
 from werkzeug.utils import secure_filename
-from database.db import tabela_loja, tabela_avaliacao_loja, tabela_avaliacao_item
-from models.usuario import Usuario
-from models.loja import Loja
 from models.item_catalogo.livro import Livro
 from models.item_catalogo.discos import Disco
 from models.item_catalogo.revista import Revista
@@ -12,7 +9,6 @@ from repositories import loja_repo
 from repositories import usuario_repo
 from repositories import avaliacoes_repo
 from repositories import catalogo_repo
-from repositories import admin_repo
 
 # Catálogo
 def catalogo():
@@ -126,7 +122,7 @@ def excluir_item(id_item):
 
     catalogo_repo.excluir_item(id_item)
     flash('Produto removido')
-    return(url_for('listar_catalogo', id_loja=item.id_loja))
+    return redirect(url_for('listar_catalogo', id_loja=item.id_loja))
 
 # Buscar imagem
 def imagem_item(id_item):
